@@ -1,0 +1,13 @@
+### General
+
+working/
+
+*.jar
+*/target
+
+
+### IntelliJ
+
+.idea/
+*.iml
+
