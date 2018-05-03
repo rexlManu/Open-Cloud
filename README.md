@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Tammo0987/Open-Cloud.svg?branch=dev)](https://travis-ci.org/Tammo0987/Open-Cloud)
+[![Build Status](https://travis-ci.org/Tammo0987/Open-Cloud.svg?branch=master)](https://travis-ci.org/Tammo0987/Open-Cloud)
 [![star this repo](http://githubbadges.com/star.svg?user=Tammo0987&repo=Open-Cloud)](https://github.com/Tammo0987/Open-Cloud)
 [![fork this repo](http://githubbadges.com/fork.svg?user=Tammo0987&repo=Open-Cloud)](https://github.com/Tammo0987/Open-Cloud/fork)
 
