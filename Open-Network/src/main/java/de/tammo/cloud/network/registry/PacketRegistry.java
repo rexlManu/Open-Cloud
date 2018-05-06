@@ -12,9 +12,6 @@ import java.util.Map;
 
 public class PacketRegistry {
 
-    private static final HashMap<Integer, Class<? extends Packet>> in = new HashMap<>();
-    private static final HashMap<Integer, Class<? extends Packet>> out = new HashMap<>();
-
     public static Packet getPacketById(final int id, final PacketDirection direction) throws IllegalAccessException, InstantiationException {
         return direction.getPackets().get(id).newInstance();
     }
