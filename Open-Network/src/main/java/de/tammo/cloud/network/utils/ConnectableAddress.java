@@ -2,7 +2,7 @@
  * Copyright (c) 2018. File created by Tammo
  */
 
-package de.tammo.cloud.network;
+package de.tammo.cloud.network.utils;
 
 import lombok.Data;
 

@@ -4,6 +4,7 @@
 
 package de.tammo.cloud.network;
 
+import de.tammo.cloud.network.utils.ConnectableAddress;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -51,10 +52,10 @@ public class NettyClient {
 
                     }).connect(new InetSocketAddress(this.connectableAddress.getHost(), this.connectableAddress.getPort())).syncUninterruptibly();
 
-
             ready.run();
 
             future.channel().closeFuture().syncUninterruptibly();
+            this.workerGroup.shutdownGracefully();
         }).start();
         return this;
     }
@@ -66,6 +67,11 @@ public class NettyClient {
             e.printStackTrace();
         }
         return this;
+    }
+
+    public void disconnect(final Runnable disconnected) {
+        this.workerGroup.shutdownGracefully();
+        disconnected.run();
     }
 
 }

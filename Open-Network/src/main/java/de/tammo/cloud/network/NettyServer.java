@@ -59,6 +59,8 @@ public class NettyServer {
 
             future.channel().closeFuture().syncUninterruptibly();
 
+            this.bossGroup.shutdownGracefully();
+            this.workerGroup.shutdownGracefully();
         }).start();
         return this;
     }
@@ -72,6 +74,12 @@ public class NettyServer {
             e.printStackTrace();
         }
         return this;
+    }
+
+    public void close(final Runnable closed) {
+        this.bossGroup.shutdownGracefully();
+        this.workerGroup.shutdownGracefully();
+        closed.run();
     }
 
 }
