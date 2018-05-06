@@ -8,7 +8,17 @@ import de.tammo.cloud.core.CloudApplication;
 import de.tammo.cloud.core.command.CommandHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
+import de.tammo.cloud.master.network.NetworkHandler;
+import de.tammo.cloud.master.network.handler.PacketHandler;
+import de.tammo.cloud.master.network.wrapper.Wrapper;
 import de.tammo.cloud.master.setup.MasterSetup;
+import de.tammo.cloud.network.NettyServer;
+import de.tammo.cloud.network.handler.PacketDecoder;
+import de.tammo.cloud.network.handler.PacketEncoder;
+import de.tammo.cloud.network.packet.impl.ErrorPacket;
+import de.tammo.cloud.network.packet.impl.SuccessPacket;
+import de.tammo.cloud.network.registry.PacketRegistry;
+import io.netty.channel.Channel;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +26,8 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
+import java.util.function.Consumer;
 
 public class Master implements CloudApplication {
 
@@ -24,6 +36,11 @@ public class Master implements CloudApplication {
 
     @Getter
     private Logger logger;
+
+    private NettyServer nettyServer;
+
+    @Getter
+    private NetworkHandler networkHandler;
 
     @Setter
     @Getter
@@ -38,7 +55,11 @@ public class Master implements CloudApplication {
 
         this.printStartup();
 
+        this.networkHandler = new NetworkHandler();
+
         final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        this.setupServer();
 
         try {
             new MasterSetup().setup(this.logger, reader);
@@ -59,10 +80,31 @@ public class Master implements CloudApplication {
         this.shutdown();
     }
 
+    private void setupServer() {
+        this.registerPackets();
+
+        this.nettyServer = new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was bind successfully to port 1337"), channel -> {
+            channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
+            final String host = this.networkHandler.getHostFromChannel(channel);
+            final Wrapper wrapper = this.networkHandler.getWrapperByHost(host);
+            if (wrapper != null) {
+                wrapper.setChannel(channel);
+            }
+        });
+    }
+
     public void shutdown() {
         this.logger.info("Open-Cloud is stopping!");
         this.setRunning(false);
         System.exit(0);
+    }
+
+    private void registerPackets() {
+        PacketRegistry.PacketDirection.IN.addPacket(0, SuccessPacket.class);
+        PacketRegistry.PacketDirection.IN.addPacket(1, ErrorPacket.class);
+
+        PacketRegistry.PacketDirection.OUT.addPacket(0, SuccessPacket.class);
+        PacketRegistry.PacketDirection.OUT.addPacket(1, ErrorPacket.class);
     }
 
     private void printStartup() {

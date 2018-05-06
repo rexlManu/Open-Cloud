@@ -8,6 +8,12 @@ import de.tammo.cloud.core.CloudApplication;
 import de.tammo.cloud.core.command.CommandHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
+import de.tammo.cloud.network.NettyClient;
+import de.tammo.cloud.network.handler.PacketDecoder;
+import de.tammo.cloud.network.handler.PacketEncoder;
+import de.tammo.cloud.network.utils.ConnectableAddress;
+import de.tammo.cloud.wrapper.network.NetworkHandler;
+import de.tammo.cloud.wrapper.network.handler.PacketHandler;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +30,11 @@ public class Wrapper implements CloudApplication {
     @Getter
     private Logger logger;
 
+    private NettyClient nettyClient;
+
+    @Getter
+    private NetworkHandler networkHandler = new NetworkHandler();
+
     @Setter
     @Getter
     private boolean running = false;
@@ -35,6 +46,8 @@ public class Wrapper implements CloudApplication {
         this.logger = new Logger("", "Open-Cloud Wrapper", optionSet.has("debug") ? LogLevel.DEBUG : LogLevel.INFO);
 
         this.printStartup();
+
+        this.setupServer();
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -51,10 +64,20 @@ public class Wrapper implements CloudApplication {
         this.shutdown();
     }
 
+    private void setupServer() {
+        this.registerPackets();
+
+        this.nettyClient = new NettyClient(new ConnectableAddress("127.0.0.1", 1337)).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
+    }
+
     public void shutdown() {
         this.logger.info("Open-Cloud Wrapper is stopping!");
         this.setRunning(false);
         System.exit(0);
+    }
+
+    private void registerPackets() {
+
     }
 
     private void printStartup() {
