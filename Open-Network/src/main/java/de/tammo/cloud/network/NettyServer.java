@@ -41,26 +41,29 @@ public class NettyServer {
             this.bossGroup = this.EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
             this.workerGroup = this.EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
-            final ChannelFuture future = new ServerBootstrap()
-                    .group(this.bossGroup, this.workerGroup)
-                    .channel(this.EPOLL ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<Channel>() {
+            try {
+                final ChannelFuture future = new ServerBootstrap()
+                        .group(this.bossGroup, this.workerGroup)
+                        .channel(this.EPOLL ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
+                        .childHandler(new ChannelInitializer<Channel>() {
 
-                        protected void initChannel(final Channel channel) {
-                            if(sslContext != null) channel.pipeline().addLast(sslContext.newHandler(channel.alloc()));
-                            init.accept(channel);
-                        }
+                            protected void initChannel(final Channel channel) {
+                                if(sslContext != null) channel.pipeline().addLast(sslContext.newHandler(channel.alloc()));
+                                init.accept(channel);
+                            }
 
-                    })
-                    .bind(this.port)
-                    .syncUninterruptibly();
+                        })
+                        .bind(this.port)
+                        .syncUninterruptibly();
 
-            ready.run();
+                ready.run();
 
-            future.channel().closeFuture().syncUninterruptibly();
+                future.channel().closeFuture().syncUninterruptibly();
+            } finally {
+                this.workerGroup.shutdownGracefully();
+                this.bossGroup.shutdownGracefully();
+            }
 
-            this.bossGroup.shutdownGracefully();
-            this.workerGroup.shutdownGracefully();
         }).start();
         return this;
     }
@@ -77,8 +80,8 @@ public class NettyServer {
     }
 
     public void close(final Runnable closed) {
-        this.bossGroup.shutdownGracefully();
         this.workerGroup.shutdownGracefully();
+        this.bossGroup.shutdownGracefully();
         closed.run();
     }
 

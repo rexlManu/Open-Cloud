@@ -39,23 +39,27 @@ public class NettyClient {
         new Thread(() -> {
             this.workerGroup = this.EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
-            final ChannelFuture future = new Bootstrap()
-                    .group(this.workerGroup)
-                    .channel(this.EPOLL ? EpollSocketChannel.class : NioSocketChannel.class)
-                    .handler(new ChannelInitializer<Channel>() {
+            try {
+                final ChannelFuture future = new Bootstrap()
+                        .group(this.workerGroup)
+                        .channel(this.EPOLL ? EpollSocketChannel.class : NioSocketChannel.class)
+                        .handler(new ChannelInitializer<Channel>() {
 
-                        protected void initChannel(final Channel channel) {
-                            if(this.toString() != null)
-                                channel.pipeline().addLast(sslContext.newHandler(channel.alloc(), connectableAddress.getHost(), connectableAddress.getPort()));
-                            init.accept(channel);
-                        }
+                            protected void initChannel(final Channel channel) {
+                                if(this.toString() != null)
+                                    channel.pipeline().addLast(sslContext.newHandler(channel.alloc(), connectableAddress.getHost(), connectableAddress.getPort()));
+                                init.accept(channel);
+                            }
 
-                    }).connect(new InetSocketAddress(this.connectableAddress.getHost(), this.connectableAddress.getPort())).syncUninterruptibly();
+                        }).connect(new InetSocketAddress(this.connectableAddress.getHost(), this.connectableAddress.getPort())).syncUninterruptibly();
 
-            ready.run();
+                ready.run();
 
-            future.channel().closeFuture().syncUninterruptibly();
-            this.workerGroup.shutdownGracefully();
+                future.channel().closeFuture().syncUninterruptibly();
+            } finally {
+                this.workerGroup.shutdownGracefully();
+            }
+
         }).start();
         return this;
     }
