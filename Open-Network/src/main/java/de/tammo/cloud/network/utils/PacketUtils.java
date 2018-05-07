@@ -4,13 +4,13 @@
 
 package de.tammo.cloud.network.utils;
 
+import com.google.common.io.ByteStreams;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 public class PacketUtils {
 
@@ -19,8 +19,8 @@ public class PacketUtils {
         outputStream.write(bytes, 0, bytes.length);
     }
 
-    public static void readFile(final String path, final ByteBufInputStream inputStream) throws IOException {
-        Files.copy(inputStream, new File(path).toPath(), StandardCopyOption.REPLACE_EXISTING);
+    public static PacketFile readFile(final ByteBufInputStream inputStream) throws IOException {
+        return new PacketFile(ByteStreams.toByteArray(inputStream));
     }
 
 }
