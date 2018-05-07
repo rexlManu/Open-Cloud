@@ -5,6 +5,7 @@
 package de.tammo.cloud.master.network;
 
 import de.tammo.cloud.master.network.wrapper.Wrapper;
+import de.tammo.cloud.master.network.wrapper.WrapperMeta;
 import io.netty.channel.Channel;
 import lombok.Getter;
 
@@ -35,6 +36,16 @@ public class NetworkHandler {
 
     public final String getHostFromChannel(final Channel channel) {
         return ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
+    }
+
+    public final void createWrappers(final ArrayList<WrapperMeta> wrapperMetas) {
+        wrapperMetas.forEach(wrapperMeta -> this.addWrapper(new Wrapper(wrapperMeta)));
+    }
+
+    public final ArrayList<WrapperMeta> getWrapperMetas() {
+        final ArrayList<WrapperMeta> metas = new ArrayList<>();
+        this.wrappers.forEach(wrapper -> metas.add(wrapper.getWrapperMeta()));
+        return metas;
     }
 
 }

@@ -6,6 +6,7 @@ package de.tammo.cloud.master;
 
 import de.tammo.cloud.core.CloudApplication;
 import de.tammo.cloud.core.command.CommandHandler;
+import de.tammo.cloud.core.document.DocumentHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.master.network.NetworkHandler;
@@ -42,6 +43,8 @@ public class Master implements CloudApplication {
     @Getter
     private NetworkHandler networkHandler;
 
+    private DocumentHandler documentHandler;
+
     @Setter
     @Getter
     private boolean running = false;
@@ -56,6 +59,8 @@ public class Master implements CloudApplication {
         this.printStartup();
 
         this.networkHandler = new NetworkHandler();
+
+        this.documentHandler = new DocumentHandler("de.tammo.cloud.master.config");
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
@@ -83,18 +88,22 @@ public class Master implements CloudApplication {
     private void setupServer() {
         this.registerPackets();
 
-        this.nettyServer = new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was bind successfully to port 1337"), channel -> {
+        this.nettyServer = new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
             channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
             final String host = this.networkHandler.getHostFromChannel(channel);
             final Wrapper wrapper = this.networkHandler.getWrapperByHost(host);
             if (wrapper != null) {
                 wrapper.setChannel(channel);
+                this.logger.info("Wrapper from " + wrapper.getWrapperMeta().getHost() + " connected!");
             }
         });
     }
 
     public void shutdown() {
         this.logger.info("Open-Cloud is stopping!");
+
+        this.documentHandler.saveFiles();
+
         this.setRunning(false);
         System.exit(0);
     }
