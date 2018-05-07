@@ -13,6 +13,7 @@ import de.tammo.cloud.network.NettyClient;
 import de.tammo.cloud.network.handler.PacketDecoder;
 import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.utils.ConnectableAddress;
+import de.tammo.cloud.wrapper.config.settings.Settings;
 import de.tammo.cloud.wrapper.network.NetworkHandler;
 import de.tammo.cloud.wrapper.network.handler.PacketHandler;
 import joptsimple.OptionSet;
@@ -37,6 +38,10 @@ public class Wrapper implements CloudApplication {
     private NetworkHandler networkHandler = new NetworkHandler();
 
     private DocumentHandler documentHandler;
+
+    @Setter
+    @Getter
+    private Settings settings = new Settings();
 
     @Setter
     @Getter
@@ -73,12 +78,18 @@ public class Wrapper implements CloudApplication {
     private void setupServer() {
         this.registerPackets();
 
-        this.nettyClient = new NettyClient(new ConnectableAddress("127.0.0.1", 1337)).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
+        this.logger.info(this.settings.getMasterPort());
+
+        this.nettyClient = new NettyClient(new ConnectableAddress(this.settings.getMasterHost(), this.settings.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
     }
 
     public void shutdown() {
         this.logger.info("Open-Cloud Wrapper is stopping!");
+
+        this.documentHandler.saveFiles();
+
         this.setRunning(false);
+
         System.exit(0);
     }
 
