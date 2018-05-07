@@ -33,7 +33,7 @@ public class CommandHandler {
     }
 
     public void executeCommand(final String message, final Logger logger) {
-        if(message.trim().isEmpty()) return;
+        if (message.trim().isEmpty()) return;
 
         final AtomicBoolean found = new AtomicBoolean(false);
 
@@ -47,11 +47,11 @@ public class CommandHandler {
             if (triggers.stream().anyMatch(trigger -> arguments[0].equalsIgnoreCase(trigger))) {
                 final String[] args = new String[arguments.length - 1];
                 System.arraycopy(arguments, 1, args, 0, args.length);
-                command.execute(args);
+                if (!command.execute(args)) command.printSyntax();
                 found.set(true);
             }
         });
 
-        if(!found.get()) logger.info("Command not found!");
+        if (!found.get()) logger.info("Command not found!");
     }
 }

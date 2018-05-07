@@ -56,7 +56,7 @@ public class Master implements CloudApplication {
 
         this.logger = new Logger("", "Open-Cloud", optionSet.has("debug") ? LogLevel.DEBUG : LogLevel.INFO);
 
-        this.printStartup();
+        this.printHeader("Open-Cloud", this.logger);
 
         this.networkHandler = new NetworkHandler();
 
@@ -114,41 +114,6 @@ public class Master implements CloudApplication {
 
         PacketRegistry.PacketDirection.OUT.addPacket(0, SuccessPacket.class);
         PacketRegistry.PacketDirection.OUT.addPacket(1, ErrorPacket.class);
-    }
-
-    private void printStartup() {
-        this.logger.info("   ____                      _____ _                 _ ");
-        this.logger.info("  / __ \\                    / ____| |               | |");
-        this.logger.info(" | |  | |_ __   ___ _ __   | |    | | ___  _   _  __| |");
-        this.logger.info(" | |  | | '_ \\ / _ \\ '_ \\  | |    | |/ _ \\| | | |/ _` |");
-        this.logger.info(" | |__| | |_) |  __/ | | | | |____| | (_) | |_| | (_| |");
-        this.logger.info("  \\____/| .__/ \\___|_| |_|  \\_____|_|\\___/ \\__,_|\\__,_|");
-        this.logger.info("        | |                                            ");
-        this.logger.info("        |_|                                            ");
-
-        this.sleep(200);
-
-        this.logger.info("");
-
-        this.sleep(200);
-
-        this.logger.info("Starting Open-Cloud!");
-    }
-
-    private void sleep(final long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sleep() {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
 }

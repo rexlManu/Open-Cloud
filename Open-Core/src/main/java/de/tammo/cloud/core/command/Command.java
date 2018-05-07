@@ -11,7 +11,9 @@ import java.lang.annotation.Target;
 
 public interface Command {
 
-    void execute(final String[] args);
+    boolean execute(final String[] args);
+
+    default void printSyntax() {}
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
