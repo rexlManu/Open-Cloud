@@ -4,6 +4,8 @@
 
 package de.tammo.cloud.network;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import de.tammo.cloud.core.threading.ThreadBuilder;
 import de.tammo.cloud.network.utils.ConnectableAddress;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -36,7 +38,7 @@ public class NettyClient {
     private final boolean EPOLL = Epoll.isAvailable();
 
     public final NettyClient connect(final Runnable ready, final Consumer<Channel> init) {
-        new Thread(() -> {
+        new ThreadBuilder("Netty Client", () -> {
             this.workerGroup = this.EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
             try {
@@ -46,7 +48,7 @@ public class NettyClient {
                         .handler(new ChannelInitializer<Channel>() {
 
                             protected void initChannel(final Channel channel) {
-                                if(this.toString() != null)
+                                if (this.toString() != null)
                                     channel.pipeline().addLast(sslContext.newHandler(channel.alloc(), connectableAddress.getHost(), connectableAddress.getPort()));
                                 init.accept(channel);
                             }
@@ -59,8 +61,7 @@ public class NettyClient {
             } finally {
                 this.workerGroup.shutdownGracefully();
             }
-
-        }).start();
+        }).setDaemon().start();
         return this;
     }
 
