@@ -23,6 +23,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 import javax.net.ssl.SSLException;
+import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 

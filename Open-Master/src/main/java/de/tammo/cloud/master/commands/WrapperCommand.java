@@ -20,6 +20,7 @@ public class WrapperCommand implements Command {
                 Master.getMaster().getLogger().info("<-- Wrapper -->");
                 Master.getMaster().getNetworkHandler().getWrappers().forEach(wrapper -> Master.getMaster().getLogger().info("Wrapper on host " + wrapper.getWrapperMeta().getHost() + " with unique id " + wrapper.getWrapperMeta().getUuid().toString() + (wrapper.isConnected() ? " is connected" : " is not connected")));
                 Master.getMaster().getLogger().info("");
+                return true;
             }
         } else if (args.length == 2) {
             if (args[0].equalsIgnoreCase("info")) {
@@ -28,6 +29,7 @@ public class WrapperCommand implements Command {
                     Master.getMaster().getLogger().warn("Wrapper not available!");
                 } else {
                     Master.getMaster().getLogger().info("Wrapper with unique id " + wrapper.getWrapperMeta().getUuid().toString() + " is " + (wrapper.isConnected() ? "connected" : "not connected"));
+                    return true;
                 }
             } else if (args[0].equalsIgnoreCase("create")) {
                 if (Master.getMaster().getNetworkHandler().getWrapperByHost(args[1]) != null) {
@@ -38,6 +40,7 @@ public class WrapperCommand implements Command {
                 final Wrapper wrapper = new Wrapper(new WrapperMeta(UUID.randomUUID(), args[1]));
                 Master.getMaster().getNetworkHandler().addWrapper(wrapper);
                 Master.getMaster().getLogger().info("Added wrapper on host " + wrapper.getWrapperMeta().getHost() + " with unique id " + wrapper.getWrapperMeta().getUuid().toString());
+                return true;
             } else if (args[0].equalsIgnoreCase("delete")) {
                 final Wrapper wrapper = Master.getMaster().getNetworkHandler().getWrapperByHost(args[1]);
                 if (wrapper == null) {
@@ -46,6 +49,7 @@ public class WrapperCommand implements Command {
                 }
                 Master.getMaster().getNetworkHandler().removeWrapper(wrapper);
                 Master.getMaster().getLogger().info("Removed wrapper with host " + wrapper.getWrapperMeta().getHost() + "!");
+                return true;
             }
         }
         return false;

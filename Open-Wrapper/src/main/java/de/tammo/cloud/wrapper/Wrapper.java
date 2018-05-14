@@ -13,7 +13,7 @@ import de.tammo.cloud.network.NettyClient;
 import de.tammo.cloud.network.handler.PacketDecoder;
 import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.utils.ConnectableAddress;
-import de.tammo.cloud.wrapper.config.settings.Settings;
+import de.tammo.cloud.wrapper.config.settings.Configuration;
 import de.tammo.cloud.wrapper.network.NetworkHandler;
 import de.tammo.cloud.wrapper.network.handler.PacketHandler;
 import joptsimple.OptionSet;
@@ -23,6 +23,7 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 
 public class Wrapper implements CloudApplication {
 
@@ -41,7 +42,7 @@ public class Wrapper implements CloudApplication {
 
     @Setter
     @Getter
-    private Settings settings = new Settings();
+    private Configuration configuration = new Configuration();
 
     @Setter
     @Getter
@@ -78,9 +79,7 @@ public class Wrapper implements CloudApplication {
     private void setupServer() {
         this.registerPackets();
 
-        this.logger.info(this.settings.getMasterPort());
-
-        this.nettyClient = new NettyClient(new ConnectableAddress(this.settings.getMasterHost(), this.settings.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
+        this.nettyClient = new NettyClient(new ConnectableAddress(this.configuration.getMasterHost(), this.configuration.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
     }
 
     public void shutdown() {

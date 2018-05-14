@@ -7,7 +7,7 @@ package de.tammo.cloud.wrapper.config.settings;
 import lombok.Data;
 
 @Data
-public class Settings {
+public class Configuration {
 
     private String masterHost = "127.0.0.1";
 

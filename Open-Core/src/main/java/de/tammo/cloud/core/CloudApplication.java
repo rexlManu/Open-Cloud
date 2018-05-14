@@ -27,7 +27,7 @@ public interface CloudApplication {
 
         logger.info("");
 
-        sleep(200);
+        this.sleep(200);
 
         logger.info("Starting " + module + "!");
     }
