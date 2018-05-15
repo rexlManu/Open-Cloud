@@ -18,5 +18,3 @@ This project is open source to give everyone the opportunity to make feature sug
 ## De
 Dieses Projekt ist Open Source, um möglichst viele Vorschläge entgegen zu nehmen und ggf. umsetzen zu können. 
 Falls du etwas verbessern möchtest oder einen Feature Vorschlag hast, dann erstelle doch einfach einen Pull-Request mit deiner Änderung beziehungsweise deinem Vorschlag!
-
-Test
