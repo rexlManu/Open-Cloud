@@ -111,7 +111,6 @@ public class Master implements CloudApplication {
 
         this.documentHandler.saveFiles();
 
-        this.setRunning(false);
         System.exit(0);
     }
 

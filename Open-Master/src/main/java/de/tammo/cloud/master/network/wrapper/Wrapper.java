@@ -32,11 +32,8 @@ public class Wrapper {
         }
     }
 
-    public void executeCommand(final String command) {
-
-    }
-
     public void disconnect() {
+        this.channel.close();
         this.channel = null;
         this.queue.clear();
     }

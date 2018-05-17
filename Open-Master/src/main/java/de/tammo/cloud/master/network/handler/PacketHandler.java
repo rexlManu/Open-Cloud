@@ -19,7 +19,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
                 wrapper.sendPacket(wrapper.getQueue().poll());
             }
         } else {
-            Master.getMaster().getLogger().debug("Unknown wrapper!");
+            Master.getMaster().getLogger().warn("Unknown wrapper!");
         }
     }
 

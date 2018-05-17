@@ -55,7 +55,7 @@ public class WrapperCommand implements Command {
         return false;
     }
 
-    public void printSyntax() {
+    public void printHelp() {
         Master.getMaster().getLogger().info("wrapper list");
         Master.getMaster().getLogger().info("wrapper info <host>");
         Master.getMaster().getLogger().info("wrapper create <host>");

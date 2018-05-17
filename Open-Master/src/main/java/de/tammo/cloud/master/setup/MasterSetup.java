@@ -12,12 +12,10 @@ import de.tammo.cloud.master.network.wrapper.Wrapper;
 import de.tammo.cloud.master.network.wrapper.WrapperMeta;
 import de.tammo.cloud.security.Hashing;
 import de.tammo.cloud.security.user.CloudUser;
-import de.tammo.cloud.security.user.CloudUserHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public class MasterSetup implements Setup {
 
@@ -25,9 +23,7 @@ public class MasterSetup implements Setup {
         if (Master.getMaster().getCloudUserHandler().getCloudUsers().isEmpty()) {
             new StringRequest().request(logger, "Type in the name of the first user:", reader, name -> {
                 try {
-                    new StringRequest().request(logger, "Type in the password for the first user:", reader, input -> {
-                        Master.getMaster().getCloudUserHandler().getCloudUsers().add(new CloudUser(name, UUID.randomUUID(), Hashing.hash(input)));
-                    });
+                    new StringRequest().request(logger, "Type in the password for the first user:", reader, input -> Master.getMaster().getCloudUserHandler().getCloudUsers().add(new CloudUser(name, UUID.randomUUID(), Hashing.hash(input))));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

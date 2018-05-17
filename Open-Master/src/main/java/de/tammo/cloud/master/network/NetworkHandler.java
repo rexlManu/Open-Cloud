@@ -11,16 +11,11 @@ import lombok.Getter;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class NetworkHandler {
 
     @Getter
     private final ArrayList<Wrapper> wrappers = new ArrayList<>();
-
-    public final Wrapper getWrapperByUUID(final UUID uuid) {
-        return this.wrappers.stream().filter(wrapper -> wrapper.getWrapperMeta().getUuid().toString().equals(uuid.toString())).findFirst().orElse(null);
-    }
 
     public final Wrapper getWrapperByHost(final String host) {
         return this.wrappers.stream().filter(wrapper -> wrapper.getWrapperMeta().getHost().equalsIgnoreCase(host)).findFirst().orElse(null);
