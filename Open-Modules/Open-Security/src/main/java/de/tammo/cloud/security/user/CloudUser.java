@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-class CloudUser {
+public class CloudUser {
 
     private final String name;
 

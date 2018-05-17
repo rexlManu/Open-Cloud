@@ -14,7 +14,12 @@ public class StringRequest {
 
     public void request(final Logger logger, final String request, final BufferedReader reader, final Consumer<String> accept) throws IOException {
         logger.info(request);
-        accept.accept(reader.readLine());
+        final String input = reader.readLine();
+        if (input.trim().isEmpty()) {
+            this.request(logger, request, reader, accept);
+        } else {
+            accept.accept(input);
+        }
     }
 
 }

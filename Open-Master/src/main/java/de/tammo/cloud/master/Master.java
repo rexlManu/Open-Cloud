@@ -19,6 +19,7 @@ import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.packet.impl.ErrorPacket;
 import de.tammo.cloud.network.packet.impl.SuccessPacket;
 import de.tammo.cloud.network.registry.PacketRegistry;
+import de.tammo.cloud.security.user.CloudUserHandler;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +39,9 @@ public class Master implements CloudApplication {
     @Getter
     private NetworkHandler networkHandler;
 
+    @Getter
+    private CloudUserHandler cloudUserHandler;
+
     private DocumentHandler documentHandler;
 
     @Setter
@@ -54,6 +58,8 @@ public class Master implements CloudApplication {
         this.printHeader("Open-Cloud", this.logger);
 
         this.networkHandler = new NetworkHandler();
+
+        this.cloudUserHandler = new CloudUserHandler();
 
         this.documentHandler = new DocumentHandler("de.tammo.cloud.master.config");
 
