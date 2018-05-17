@@ -29,4 +29,10 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
         Wrapper.getWrapper().getLogger().info("Master interrupted connection!");
         Wrapper.getWrapper().shutdown();
     }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Wrapper.getWrapper().getLogger().warn("Master does not accepted this connection!");
+        super.channelInactive(ctx);
+    }
 }

@@ -84,8 +84,14 @@ public class Master implements CloudApplication {
         this.registerPackets();
 
         new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
-            channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
             final String host = this.networkHandler.getHostFromChannel(channel);
+            if (!this.networkHandler.isWhitelisted(host)) {
+                channel.close().syncUninterruptibly();
+                this.logger.warn("A not whitelisted Wrapper would like to connect to this master!");
+                return;
+            }
+
+            channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
             final Wrapper wrapper = this.networkHandler.getWrapperByHost(host);
             if (wrapper != null) {
                 wrapper.setChannel(channel);
