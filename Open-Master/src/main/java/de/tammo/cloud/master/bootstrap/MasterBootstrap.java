@@ -4,16 +4,16 @@
 
 package de.tammo.cloud.master.bootstrap;
 
-import de.tammo.cloud.core.exceptions.JavaRequiredException;
+import de.tammo.cloud.core.exceptions.JavaVersionRequiredException;
 import de.tammo.cloud.master.Master;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 public class MasterBootstrap {
 
-    public static void main(final String[] args) throws JavaRequiredException {
+    public static void main(final String[] args) throws JavaVersionRequiredException {
         if (Double.parseDouble(System.getProperty("java.class.version")) < 52) {
-            throw new JavaRequiredException();
+            throw new JavaVersionRequiredException();
         } else {
             new MasterBootstrap(args);
         }

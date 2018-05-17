@@ -4,16 +4,16 @@
 
 package de.tammo.cloud.wrapper.bootstrap;
 
-import de.tammo.cloud.core.exceptions.JavaRequiredException;
+import de.tammo.cloud.core.exceptions.JavaVersionRequiredException;
 import de.tammo.cloud.wrapper.Wrapper;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
 public class WrapperBootstrap {
 
-    public static void main(final String[] args) throws JavaRequiredException {
+    public static void main(final String[] args) throws JavaVersionRequiredException {
         if (Double.parseDouble(System.getProperty("java.class.version")) < 52) {
-            throw new JavaRequiredException();
+            throw new JavaVersionRequiredException();
         } else {
             new WrapperBootstrap(args);
         }
