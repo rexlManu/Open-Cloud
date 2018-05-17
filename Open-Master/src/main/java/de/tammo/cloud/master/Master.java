@@ -4,8 +4,8 @@
 
 package de.tammo.cloud.master;
 
+import de.tammo.cloud.command.CommandHandler;
 import de.tammo.cloud.core.CloudApplication;
-import de.tammo.cloud.core.command.CommandHandler;
 import de.tammo.cloud.core.document.DocumentHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
@@ -19,7 +19,7 @@ import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.packet.impl.ErrorPacket;
 import de.tammo.cloud.network.packet.impl.SuccessPacket;
 import de.tammo.cloud.network.registry.PacketRegistry;
-import io.netty.channel.Channel;
+import de.tammo.cloud.security.user.CloudUserHandler;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +27,6 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.util.function.Consumer;
 
 public class Master implements CloudApplication {
 
@@ -38,10 +36,11 @@ public class Master implements CloudApplication {
     @Getter
     private Logger logger;
 
-    private NettyServer nettyServer;
-
     @Getter
     private NetworkHandler networkHandler;
+
+    @Getter
+    private CloudUserHandler cloudUserHandler;
 
     private DocumentHandler documentHandler;
 
@@ -59,6 +58,8 @@ public class Master implements CloudApplication {
         this.printHeader("Open-Cloud", this.logger);
 
         this.networkHandler = new NetworkHandler();
+
+        this.cloudUserHandler = new CloudUserHandler();
 
         this.documentHandler = new DocumentHandler("de.tammo.cloud.master.config");
 
@@ -88,9 +89,15 @@ public class Master implements CloudApplication {
     private void setupServer() {
         this.registerPackets();
 
-        this.nettyServer = new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
-            channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
+        new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
             final String host = this.networkHandler.getHostFromChannel(channel);
+            if (!this.networkHandler.isWhitelisted(host)) {
+                channel.close().syncUninterruptibly();
+                this.logger.warn("A not whitelisted Wrapper would like to connect to this master!");
+                return;
+            }
+
+            channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
             final Wrapper wrapper = this.networkHandler.getWrapperByHost(host);
             if (wrapper != null) {
                 wrapper.setChannel(channel);

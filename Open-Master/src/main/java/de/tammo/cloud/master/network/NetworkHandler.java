@@ -48,4 +48,8 @@ public class NetworkHandler {
         return metas;
     }
 
+    public boolean isWhitelisted(final String ip) {
+        return this.wrappers.stream().filter(wrapper -> wrapper.getWrapperMeta().getHost().equalsIgnoreCase(ip)).findFirst().orElse(null) != null;
+    }
+
 }
