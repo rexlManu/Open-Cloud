@@ -5,7 +5,7 @@
 # Open-Cloud 
 
 ## En
-Open-Cloud is a Cloud System, allowing you to manage your Minecraft network.
+Open-Cloud is a Cloud System giving you the ability to easilly manage the Minecraft Servers affiliated with your Minecraft Network.
 
 ## De
 Open-Cloud ist ein Cloud System, mit dem du dein Minecraft Netzwerk verwalten kannst.
