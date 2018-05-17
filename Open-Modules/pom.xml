@@ -15,6 +15,7 @@
 
     <artifactId>Open-Modules</artifactId>
     <packaging>pom</packaging>
+
     <modules>
         <module>Open-Security</module>
         <module>Open-Command</module>
