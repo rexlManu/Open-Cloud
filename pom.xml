@@ -19,6 +19,7 @@
         <module>Open-Master</module>
         <module>Open-Wrapper</module>
         <module>Open-Network</module>
+        <module>Open-Modules</module>
     </modules>
 
     <properties>

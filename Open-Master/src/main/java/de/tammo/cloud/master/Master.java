@@ -19,6 +19,7 @@ import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.packet.impl.ErrorPacket;
 import de.tammo.cloud.network.packet.impl.SuccessPacket;
 import de.tammo.cloud.network.registry.PacketRegistry;
+import de.tammo.cloud.security.Hashing;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;

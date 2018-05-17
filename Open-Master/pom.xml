@@ -43,6 +43,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>de.tammo.cloud</groupId>
+            <artifactId>Open-Security</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
 
