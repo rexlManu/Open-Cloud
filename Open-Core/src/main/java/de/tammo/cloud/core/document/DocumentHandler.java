@@ -30,7 +30,7 @@ public class DocumentHandler {
         this.loadFiles();
     }
 
-    public void loadFiles() {
+    private void loadFiles() {
         this.files.forEach(documentFile -> {
             try {
                 documentFile.load();
