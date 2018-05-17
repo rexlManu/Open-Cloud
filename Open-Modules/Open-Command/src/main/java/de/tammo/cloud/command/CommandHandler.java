@@ -2,7 +2,7 @@
  * Copyright (c) 2018. File created by Tammo
  */
 
-package de.tammo.cloud.core.command;
+package de.tammo.cloud.command;
 
 import com.google.common.reflect.ClassPath;
 import de.tammo.cloud.core.logging.Logger;
@@ -47,11 +47,12 @@ public class CommandHandler {
             if (triggers.stream().anyMatch(trigger -> arguments[0].equalsIgnoreCase(trigger))) {
                 final String[] args = new String[arguments.length - 1];
                 System.arraycopy(arguments, 1, args, 0, args.length);
-                if (!command.execute(args)) command.printSyntax();
+                if (!command.execute(args)) command.printHelp();
                 found.set(true);
             }
         });
 
         if (!found.get()) logger.info("Command not found!");
     }
+
 }

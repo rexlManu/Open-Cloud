@@ -4,7 +4,7 @@
 
 package de.tammo.cloud.master.commands;
 
-import de.tammo.cloud.core.command.Command;
+import de.tammo.cloud.command.Command;
 import de.tammo.cloud.master.Master;
 import de.tammo.cloud.master.network.wrapper.Wrapper;
 import de.tammo.cloud.master.network.wrapper.WrapperMeta;

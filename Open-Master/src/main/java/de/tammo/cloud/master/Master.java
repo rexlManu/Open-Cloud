@@ -4,8 +4,8 @@
 
 package de.tammo.cloud.master;
 
+import de.tammo.cloud.command.CommandHandler;
 import de.tammo.cloud.core.CloudApplication;
-import de.tammo.cloud.core.command.CommandHandler;
 import de.tammo.cloud.core.document.DocumentHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;

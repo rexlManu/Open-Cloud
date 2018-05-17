@@ -4,8 +4,8 @@
 
 package de.tammo.cloud.wrapper;
 
+import de.tammo.cloud.command.CommandHandler;
 import de.tammo.cloud.core.CloudApplication;
-import de.tammo.cloud.core.command.CommandHandler;
 import de.tammo.cloud.core.document.DocumentHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
@@ -13,7 +13,7 @@ import de.tammo.cloud.network.NettyClient;
 import de.tammo.cloud.network.handler.PacketDecoder;
 import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.utils.ConnectableAddress;
-import de.tammo.cloud.wrapper.config.settings.Configuration;
+import de.tammo.cloud.wrapper.config.configuration.Configuration;
 import de.tammo.cloud.wrapper.network.NetworkHandler;
 import de.tammo.cloud.wrapper.network.handler.PacketHandler;
 import joptsimple.OptionSet;
@@ -23,7 +23,6 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 
 public class Wrapper implements CloudApplication {
 
@@ -62,6 +61,14 @@ public class Wrapper implements CloudApplication {
         this.setupServer();
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        /*
+        try {
+            new WrapperSetup().setup(this.logger, reader);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
 
         final CommandHandler commandHandler = new CommandHandler("de.tammo.cloud.wrapper.commands", this.logger);
 
