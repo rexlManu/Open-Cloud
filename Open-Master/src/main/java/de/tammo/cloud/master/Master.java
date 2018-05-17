@@ -19,7 +19,6 @@ import de.tammo.cloud.network.handler.PacketEncoder;
 import de.tammo.cloud.network.packet.impl.ErrorPacket;
 import de.tammo.cloud.network.packet.impl.SuccessPacket;
 import de.tammo.cloud.network.registry.PacketRegistry;
-import io.netty.channel.Channel;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +26,6 @@ import lombok.Setter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
-import java.util.function.Consumer;
 
 public class Master implements CloudApplication {
 
@@ -37,8 +34,6 @@ public class Master implements CloudApplication {
 
     @Getter
     private Logger logger;
-
-    private NettyServer nettyServer;
 
     @Getter
     private NetworkHandler networkHandler;
@@ -88,7 +83,7 @@ public class Master implements CloudApplication {
     private void setupServer() {
         this.registerPackets();
 
-        this.nettyServer = new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
+        new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
             channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler());
             final String host = this.networkHandler.getHostFromChannel(channel);
             final Wrapper wrapper = this.networkHandler.getWrapperByHost(host);
