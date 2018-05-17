@@ -28,8 +28,8 @@ public class NetworkHandler {
         }
     }
 
-    public final boolean isConnected() {
-        return this.masterChannel != null;
+    private boolean isConnected() {
+        return this.masterChannel != null && this.masterChannel.isActive() && this.masterChannel.isOpen();
     }
 
     public final String getHostFromChannel(final Channel channel) {

@@ -32,8 +32,6 @@ public class Wrapper implements CloudApplication {
     @Getter
     private Logger logger;
 
-    private NettyClient nettyClient;
-
     @Getter
     private NetworkHandler networkHandler = new NetworkHandler();
 
@@ -62,14 +60,6 @@ public class Wrapper implements CloudApplication {
 
         final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        /*
-        try {
-            new WrapperSetup().setup(this.logger, reader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
         final CommandHandler commandHandler = new CommandHandler("de.tammo.cloud.wrapper.commands", this.logger);
 
         while (this.running) {
@@ -86,7 +76,7 @@ public class Wrapper implements CloudApplication {
     private void setupServer() {
         this.registerPackets();
 
-        this.nettyClient = new NettyClient(new ConnectableAddress(this.configuration.getMasterHost(), this.configuration.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
+        new NettyClient(new ConnectableAddress(this.configuration.getMasterHost(), this.configuration.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
     }
 
     public void shutdown() {

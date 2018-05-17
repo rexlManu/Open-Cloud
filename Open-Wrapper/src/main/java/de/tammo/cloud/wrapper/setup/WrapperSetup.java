@@ -8,12 +8,11 @@ import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.core.setup.Setup;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.UUID;
 
 public class WrapperSetup implements Setup {
 
-    public void setup(final Logger logger, final BufferedReader reader) throws IOException {
+    public void setup(final Logger logger, final BufferedReader reader) {
         logger.info("You have to enter this key in the master!");
         logger.info("Your key is: " + this.generateWrapperKey());
         logger.info("Never show this key other guys!");
