@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import de.tammo.cloud.core.document.DocumentFile;
 import de.tammo.cloud.wrapper.Wrapper;
-import de.tammo.cloud.wrapper.config.settings.Configuration;
+import de.tammo.cloud.wrapper.config.configuration.Configuration;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
