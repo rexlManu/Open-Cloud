@@ -22,7 +22,7 @@ public class LoginSetup implements Setup {
             logger.info("Currently no user created. Create first user ->");
             new StringRequest().request(logger, "Type in the name for the first user:", reader, name -> {
                 if (name.equalsIgnoreCase("exit")) {
-                    logger.info("The should not be exit!");
+                    logger.info("The name should not be exit!");
                     Master.getMaster().shutdown();
                 } else {
                     try {
