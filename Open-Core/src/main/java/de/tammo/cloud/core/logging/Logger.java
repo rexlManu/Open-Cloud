@@ -43,7 +43,7 @@ public class Logger {
         if (this.level.getLevel() > logLevel.getLevel()) return;
 
         System.out.println("\r[" + this.timeFormat.format(new Date()) + "] " + this.prefix + " [" + logLevel.getName() + "] " + any.toString());
-        System.out.print("> ");
+        System.out.print("\r> ");
     }
 
 }

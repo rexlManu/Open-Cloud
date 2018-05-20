@@ -89,8 +89,10 @@ public class NettyClient {
                 this.future.channel().close().syncUninterruptibly();
             }
         }
-        this.workerGroup.shutdownGracefully();
-        disconnected.run();
+        if (!this.workerGroup.isShutdown()) {
+            this.workerGroup.shutdownGracefully();
+            disconnected.run();
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import de.tammo.cloud.network.packet.impl.ErrorPacket;
 import de.tammo.cloud.network.packet.impl.SuccessPacket;
 import de.tammo.cloud.network.registry.PacketRegistry;
 import de.tammo.cloud.security.user.CloudUserHandler;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import lombok.Getter;

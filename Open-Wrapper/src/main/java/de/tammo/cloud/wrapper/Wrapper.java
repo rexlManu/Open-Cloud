@@ -99,8 +99,6 @@ public class Wrapper implements CloudApplication {
     public void shutdown() {
         this.logger.info("Open-Cloud Wrapper is stopping!");
 
-        this.setRunning(false);
-
         this.documentHandler.saveFiles();
 
         this.nettyClient.disconnect(() -> this.logger.info("Wrapper is disconnected!"));
