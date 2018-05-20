@@ -19,14 +19,14 @@ public class LoginSetup implements Setup {
 
     public void setup(final Logger logger, final ConsoleReader reader) throws IOException {
         if (Master.getMaster().getCloudUserHandler().getCloudUsers().isEmpty()) {
-            logger.info("Currently no user created. Create first user ->");
-            new StringRequest().request(logger, "Type in the name for the first user:", reader, name -> {
+            logger.info("There is currently user created. Creating the first user -> ");
+            new StringRequest().request(logger, "Please enter a name for the setup user:", reader, name -> {
                 if (name.equalsIgnoreCase("exit")) {
-                    logger.info("The name should not be exit!");
+                    logger.info("\"exit\" is an invalid username. Exiting...");
                     Master.getMaster().shutdown();
                 } else {
                     try {
-                        new StringRequest().request(logger, "Type in the password for the first user:", reader, input -> Master.getMaster().getCloudUserHandler().getCloudUsers().add(new CloudUser(name, UUID.randomUUID(), Hashing.hash(input))));
+                        new StringRequest().request(logger, "Please enter the password for the setup user:", reader, input -> Master.getMaster().getCloudUserHandler().getCloudUsers().add(new CloudUser(name, UUID.randomUUID(), Hashing.hash(input))));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -39,7 +39,7 @@ public class LoginSetup implements Setup {
 
     private void login(final Logger logger, final ConsoleReader reader) throws IOException {
         logger.info("Welcome to the login!");
-        new StringRequest().request(logger, "Type in your username:", reader, name -> {
+        new StringRequest().request(logger, "Please enter your username:", reader, name -> {
             if (name.equalsIgnoreCase("exit")) {
                 Master.getMaster().shutdown();
             } else {
@@ -54,7 +54,7 @@ public class LoginSetup implements Setup {
                     try {
                         new StringRequest().request(logger,"Password:", reader, password -> {
                             if (Hashing.verify(password, cloudUser.getHash())) {
-                                logger.info("You are now logged in!");
+                                logger.info("You successfully logged in!");
                             } else {
                                 try {
                                     this.login(logger, reader);
