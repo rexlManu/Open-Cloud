@@ -15,7 +15,7 @@ public class MasterSetup implements Setup {
 
     public void setup(final Logger logger, final ConsoleReader reader) throws IOException {
         if (Master.getMaster().getNetworkHandler().getWrapperMetas().isEmpty()) {
-            logger.info("To create a wrapper use \"wrapper create <host>\"!");
+            logger.info("To create a wrapper use the following command: \"wrapper create <host>\"!");
         }
     }
 
