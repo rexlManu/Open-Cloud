@@ -20,6 +20,7 @@
         <module>Open-Wrapper</module>
         <module>Open-Network</module>
         <module>Open-Modules</module>
+        <module>Open-API</module>
     </modules>
 
     <properties>
