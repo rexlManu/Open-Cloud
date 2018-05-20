@@ -12,7 +12,7 @@ import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.master.network.NetworkHandler;
 import de.tammo.cloud.master.network.handler.PacketHandler;
 import de.tammo.cloud.master.network.wrapper.Wrapper;
-import de.tammo.cloud.master.setup.MasterSetup;
+import de.tammo.cloud.master.setup.LoginSetup;
 import de.tammo.cloud.network.NettyServer;
 import de.tammo.cloud.network.handler.PacketDecoder;
 import de.tammo.cloud.network.handler.PacketEncoder;
@@ -20,13 +20,12 @@ import de.tammo.cloud.network.packet.impl.ErrorPacket;
 import de.tammo.cloud.network.packet.impl.SuccessPacket;
 import de.tammo.cloud.network.registry.PacketRegistry;
 import de.tammo.cloud.security.user.CloudUserHandler;
+import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class Master implements CloudApplication {
 
@@ -48,7 +47,24 @@ public class Master implements CloudApplication {
     @Getter
     private boolean running = false;
 
-    public void bootstrap(final OptionSet optionSet) {
+    /*
+
+    instance -> running
+    logger init
+    print header
+
+    instances
+
+    reader
+
+    login (login setup) -> Setup -> Setup Server -> Command Handler -> Shutdown
+
+    Logger -> remove prompt format
+    Console Reader readLine with prompt
+
+     */
+
+    public void bootstrap(final OptionSet optionSet) throws IOException{
         master = this;
 
         this.setRunning(true);
@@ -63,15 +79,12 @@ public class Master implements CloudApplication {
 
         this.documentHandler = new DocumentHandler("de.tammo.cloud.master.config");
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        final ConsoleReader reader = new ConsoleReader(null, System.in, System.out, null);
+        reader.setHistoryEnabled(false);
 
-        this.setupServer();
+        new LoginSetup().setup(this.logger, reader);
 
-        try {
-            new MasterSetup().setup(this.logger, reader);
-        } catch (IOException e) {
-            this.logger.error("Error while setting up master!", e);
-        }
+        this.setupServer(() -> this.logger.info("Server was successfully bound to port 1337"));
 
         final CommandHandler commandHandler = new CommandHandler("de.tammo.cloud.master.commands", this.logger);
 
@@ -83,13 +96,15 @@ public class Master implements CloudApplication {
             }
         }
 
+        reader.close();
+
         this.shutdown();
     }
 
-    private void setupServer() {
+    private void setupServer(final Runnable ready) {
         this.registerPackets();
 
-        new NettyServer(1337).withSSL().bind(() -> this.logger.info("Server was successfully bound to port 1337"), channel -> {
+        new NettyServer(1337).withSSL().bind(ready, channel -> {
             final String host = this.networkHandler.getHostFromChannel(channel);
             if (!this.networkHandler.isWhitelisted(host)) {
                 channel.close().syncUninterruptibly();

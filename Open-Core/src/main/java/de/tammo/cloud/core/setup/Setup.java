@@ -5,12 +5,12 @@
 package de.tammo.cloud.core.setup;
 
 import de.tammo.cloud.core.logging.Logger;
+import jline.console.ConsoleReader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 
 public interface Setup {
 
-    void setup(final Logger logger, final BufferedReader reader) throws IOException;
+    void setup(final Logger logger, final ConsoleReader reader) throws IOException;
 
 }

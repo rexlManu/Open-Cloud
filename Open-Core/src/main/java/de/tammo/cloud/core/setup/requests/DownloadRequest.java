@@ -16,7 +16,7 @@ import java.nio.file.StandardCopyOption;
 
 public class DownloadRequest {
 
-    public void request(final String url, final String path, final Logger logger, final Runnable complete) throws IOException{
+    public void request(final Logger logger, final String url, final String path, final Runnable complete) throws IOException{
         final HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
         if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {

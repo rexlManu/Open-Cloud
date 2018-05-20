@@ -9,6 +9,8 @@ import de.tammo.cloud.master.Master;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 
+import java.io.IOException;
+
 public class MasterBootstrap {
 
     public static void main(final String[] args) throws JavaVersionRequiredException {
@@ -28,7 +30,13 @@ public class MasterBootstrap {
 
         final OptionSet optionSet = optionParser.parse(args);
 
-        new Master().bootstrap(optionSet);
+        System.setProperty("jline.WindowsTerminal.directConsole", "false");
+
+        try {
+            new Master().bootstrap(optionSet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

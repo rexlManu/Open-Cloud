@@ -21,9 +21,14 @@ public class ThreadBuilder {
         return this;
     }
 
-    public final ThreadBuilder start() {
+    public final ThreadBuilder startThread() {
         this.thread.start();
         return this;
+    }
+
+    public final Thread start() {
+        this.thread.start();
+        return this.thread;
     }
 
 }
