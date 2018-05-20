@@ -26,7 +26,7 @@ public class LoginSetup implements Setup {
                     Master.getMaster().shutdown();
                 } else {
                     try {
-                        new StringRequest().request(logger,"Type in the password for the first user:", reader, input -> Master.getMaster().getCloudUserHandler().getCloudUsers().add(new CloudUser(name, UUID.randomUUID(), Hashing.hash(input))));
+                        new StringRequest().request(logger, "Type in the password for the first user:", reader, input -> Master.getMaster().getCloudUserHandler().getCloudUsers().add(new CloudUser(name, UUID.randomUUID(), Hashing.hash(input))));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

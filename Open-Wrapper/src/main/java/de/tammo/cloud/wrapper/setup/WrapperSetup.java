@@ -6,18 +6,18 @@ package de.tammo.cloud.wrapper.setup;
 
 import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.core.setup.Setup;
+import de.tammo.cloud.core.setup.requests.StringRequest;
+import de.tammo.cloud.wrapper.Wrapper;
 import jline.console.ConsoleReader;
 
-import java.util.UUID;
+import java.io.IOException;
 
 public class WrapperSetup implements Setup {
 
-    public void setup(final Logger logger, final ConsoleReader reader) {
-
-    }
-
-    private String generateWrapperKey() {
-        return UUID.randomUUID().toString().replace("-", "");
+    public void setup(final Logger logger, final ConsoleReader reader) throws IOException {
+        if (Wrapper.getWrapper().getConfiguration().getKey().isEmpty()) {
+            new StringRequest().request(logger, "Type in the key, you received from the Open-Master", reader, key -> Wrapper.getWrapper().getConfiguration().setKey(key));
+        }
     }
 
 }
