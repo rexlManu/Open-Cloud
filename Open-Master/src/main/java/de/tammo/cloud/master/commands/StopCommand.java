@@ -4,13 +4,14 @@
 
 package de.tammo.cloud.master.commands;
 
-import de.tammo.cloud.core.command.Command;
+import de.tammo.cloud.command.Command;
 import de.tammo.cloud.master.Master;
 
 @Command.CommandInfo(name = "stop", aliases = {"shutdown", "terminate"})
 public class StopCommand implements Command {
 
-    public void execute(final String[] args) {
+    public boolean execute(final String[] args) {
         Master.getMaster().setRunning(false);
+        return true;
     }
 }

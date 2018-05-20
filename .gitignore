@@ -3,7 +3,7 @@
 working/
 
 *.jar
-*/target
+target/
 
 
 ### IntelliJ

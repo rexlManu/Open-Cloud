@@ -42,7 +42,8 @@ public class Logger {
     private void log(final Object any, final LogLevel logLevel) {
         if (this.level.getLevel() > logLevel.getLevel()) return;
 
-        System.out.println("[" + this.timeFormat.format(new Date()) + "] " + this.prefix + " [" + logLevel.getName() + "] " + any.toString());
+        System.out.println("\r[" + this.timeFormat.format(new Date()) + "] " + this.prefix + " [" + logLevel.getName() + "] " + any.toString());
+        System.out.print("> ");
     }
 
 }

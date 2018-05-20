@@ -6,14 +6,17 @@ package de.tammo.cloud.master.setup;
 
 import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.core.setup.Setup;
+import de.tammo.cloud.master.Master;
+import jline.console.ConsoleReader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 
 public class MasterSetup implements Setup {
 
-    public void setup(final Logger logger, final BufferedReader reader) throws IOException {
-
+    public void setup(final Logger logger, final ConsoleReader reader) throws IOException {
+        if (Master.getMaster().getNetworkHandler().getWrapperMetas().isEmpty()) {
+            logger.info("To create a wrapper use the following command: \"wrapper create <host>\"!");
+        }
     }
 
 }

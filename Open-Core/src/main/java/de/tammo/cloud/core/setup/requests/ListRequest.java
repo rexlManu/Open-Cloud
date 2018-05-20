@@ -5,15 +5,15 @@
 package de.tammo.cloud.core.setup.requests;
 
 import de.tammo.cloud.core.logging.Logger;
+import jline.console.ConsoleReader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class ListRequest {
 
-    public void request(final Logger logger, final String request, final String[] responses, final BufferedReader reader, final Consumer<String> accept) throws IOException {
+    public void request(final Logger logger, final String request, final String[] responses, final ConsoleReader reader, final Consumer<String> accept) throws IOException {
         logger.info(request + " " + this.getResponseString(responses));
         final String line = reader.readLine();
         if (this.contains(responses, line)) {

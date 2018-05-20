@@ -4,10 +4,26 @@
 
 package de.tammo.cloud.wrapper;
 
+import de.tammo.cloud.command.CommandHandler;
 import de.tammo.cloud.core.CloudApplication;
-import de.tammo.cloud.core.command.CommandHandler;
+import de.tammo.cloud.core.document.DocumentHandler;
 import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
+import de.tammo.cloud.network.NettyClient;
+import de.tammo.cloud.network.handler.PacketDecoder;
+import de.tammo.cloud.network.handler.PacketEncoder;
+import de.tammo.cloud.network.packet.Packet;
+import de.tammo.cloud.network.packet.impl.ErrorPacket;
+import de.tammo.cloud.network.packet.impl.SuccessPacket;
+import de.tammo.cloud.network.registry.PacketRegistry;
+import de.tammo.cloud.network.utils.ConnectableAddress;
+import de.tammo.cloud.wrapper.config.configuration.Configuration;
+import de.tammo.cloud.wrapper.network.NetworkHandler;
+import de.tammo.cloud.wrapper.network.handler.PacketHandler;
+import de.tammo.cloud.wrapper.network.packets.WrapperKeyOutPacket;
+import de.tammo.cloud.wrapper.network.packets.WrapperKeyValidationInPacket;
+import de.tammo.cloud.wrapper.setup.WrapperSetup;
+import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,19 +40,37 @@ public class Wrapper implements CloudApplication {
     @Getter
     private Logger logger;
 
+    @Getter
+    private NetworkHandler networkHandler = new NetworkHandler();
+
+    private DocumentHandler documentHandler;
+
+    private NettyClient nettyClient;
+
+    @Setter
+    @Getter
+    private Configuration configuration = new Configuration();
+
     @Setter
     @Getter
     private boolean running = false;
 
-    public void bootstrap(final OptionSet optionSet) {
+    public void bootstrap(final OptionSet optionSet) throws IOException {
         wrapper = this;
 
         this.setRunning(true);
+
         this.logger = new Logger("", "Open-Cloud Wrapper", optionSet.has("debug") ? LogLevel.DEBUG : LogLevel.INFO);
 
-        this.printStartup();
+        this.printHeader("Open-Cloud Wrapper", this.logger);
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        this.documentHandler = new DocumentHandler("de.tammo.cloud.wrapper.config");
+
+        final ConsoleReader reader = new ConsoleReader();
+
+        new WrapperSetup().setup(this.logger, reader);
+
+        this.setupServer();
 
         final CommandHandler commandHandler = new CommandHandler("de.tammo.cloud.wrapper.commands", this.logger);
 
@@ -48,47 +82,42 @@ public class Wrapper implements CloudApplication {
             }
         }
 
+        reader.close();
+
         this.shutdown();
+    }
+
+    private void setupServer() {
+        this.registerPackets();
+
+        this.nettyClient = new NettyClient(new ConnectableAddress(this.configuration.getMasterHost(), this.configuration.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), () -> {
+            this.logger.warn("Master is currently not available!");
+            this.shutdown();
+        }, channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
     }
 
     public void shutdown() {
         this.logger.info("Open-Cloud Wrapper is stopping!");
+
         this.setRunning(false);
+
+        this.documentHandler.saveFiles();
+
+        this.nettyClient.disconnect(() -> this.logger.info("Wrapper is disconnected!"));
+
         System.exit(0);
     }
 
-    private void printStartup() {
-        this.logger.info("   ____                      _____ _                 _ ");
-        this.logger.info("  / __ \\                    / ____| |               | |");
-        this.logger.info(" | |  | |_ __   ___ _ __   | |    | | ___  _   _  __| |");
-        this.logger.info(" | |  | | '_ \\ / _ \\ '_ \\  | |    | |/ _ \\| | | |/ _` |");
-        this.logger.info(" | |__| | |_) |  __/ | | | | |____| | (_) | |_| | (_| |");
-        this.logger.info("  \\____/| .__/ \\___|_| |_|  \\_____|_|\\___/ \\__,_|\\__,_|");
-        this.logger.info("        | |                                            ");
-        this.logger.info("        |_|                                            ");
+    private void registerPackets() {
+        PacketRegistry.PacketDirection.IN.addPacket(0, SuccessPacket.class);
+        PacketRegistry.PacketDirection.IN.addPacket(1, ErrorPacket.class);
 
-        this.sleep(200);
+        PacketRegistry.PacketDirection.IN.addPacket(201, WrapperKeyValidationInPacket.class);
 
-        this.logger.info("");
+        PacketRegistry.PacketDirection.OUT.addPacket(0, SuccessPacket.class);
+        PacketRegistry.PacketDirection.OUT.addPacket(1, ErrorPacket.class);
 
-        this.sleep(200);
-
-        this.logger.info("Starting Open-Cloud Wrapper!");
+        PacketRegistry.PacketDirection.OUT.addPacket(200, WrapperKeyOutPacket.class);
     }
 
-    private void sleep(final long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sleep() {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }
