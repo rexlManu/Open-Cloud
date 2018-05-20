@@ -5,6 +5,7 @@
 package de.tammo.cloud.master.network.handler;
 
 import de.tammo.cloud.master.Master;
+import de.tammo.cloud.master.network.packets.WrapperKeyInPacket;
 import de.tammo.cloud.master.network.wrapper.Wrapper;
 import de.tammo.cloud.network.packet.Packet;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,13 +25,20 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
     }
 
     protected void channelRead0(final ChannelHandlerContext ctx, final Packet packet) {
-        final Packet response = packet.handle(ctx.channel());
-        if(response != null) ctx.channel().writeAndFlush(response);
+        final Wrapper wrapper = Master.getMaster().getNetworkHandler().getWrapperByHost(Master.getMaster().getNetworkHandler().getHostFromChannel(ctx.channel()));
+        if (wrapper != null) {
+            if (wrapper.isVerified() || packet instanceof WrapperKeyInPacket) {
+                final Packet response = packet.handle(ctx.channel());
+                if (response != null) ctx.channel().writeAndFlush(response);
+            }
+        }
     }
 
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
         final Wrapper wrapper = Master.getMaster().getNetworkHandler().getWrapperByHost(Master.getMaster().getNetworkHandler().getHostFromChannel(ctx.channel()));
         wrapper.disconnect();
         Master.getMaster().getLogger().info("Wrapper from host " + wrapper.getWrapperMeta().getHost() + " is disconnected!");
+        super.channelInactive(ctx);
     }
+
 }

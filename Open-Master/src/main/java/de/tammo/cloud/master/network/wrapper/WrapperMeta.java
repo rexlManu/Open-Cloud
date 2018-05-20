@@ -14,4 +14,6 @@ public class WrapperMeta {
     private final UUID uuid;
 
     private final String host;
+
+    private final String key;
 }

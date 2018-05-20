@@ -25,13 +25,9 @@ public class PacketHandler extends SimpleChannelInboundHandler<Packet> {
         if(response != null) ctx.channel().writeAndFlush(response);
     }
 
-    public void exceptionCaught(final ChannelHandlerContext ctx, final Throwable cause) {
-        Wrapper.getWrapper().getLogger().info("Master interrupted connection!");
-        Wrapper.getWrapper().setRunning(false);
-    }
-
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Wrapper.getWrapper().getLogger().warn("Master does not accepted this connection!");
+    public void channelInactive(final ChannelHandlerContext ctx) throws Exception {
+        Wrapper.getWrapper().getLogger().info("Master interrupted the connection!");
+        Wrapper.getWrapper().shutdown();
         super.channelInactive(ctx);
     }
 }

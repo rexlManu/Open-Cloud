@@ -12,10 +12,18 @@ import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.network.NettyClient;
 import de.tammo.cloud.network.handler.PacketDecoder;
 import de.tammo.cloud.network.handler.PacketEncoder;
+import de.tammo.cloud.network.packet.Packet;
+import de.tammo.cloud.network.packet.impl.ErrorPacket;
+import de.tammo.cloud.network.packet.impl.SuccessPacket;
+import de.tammo.cloud.network.registry.PacketRegistry;
 import de.tammo.cloud.network.utils.ConnectableAddress;
 import de.tammo.cloud.wrapper.config.configuration.Configuration;
 import de.tammo.cloud.wrapper.network.NetworkHandler;
 import de.tammo.cloud.wrapper.network.handler.PacketHandler;
+import de.tammo.cloud.wrapper.network.packets.WrapperKeyOutPacket;
+import de.tammo.cloud.wrapper.network.packets.WrapperKeyValidationInPacket;
+import de.tammo.cloud.wrapper.setup.WrapperSetup;
+import jline.console.ConsoleReader;
 import joptsimple.OptionSet;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +45,8 @@ public class Wrapper implements CloudApplication {
 
     private DocumentHandler documentHandler;
 
+    private NettyClient nettyClient;
+
     @Setter
     @Getter
     private Configuration configuration = new Configuration();
@@ -45,7 +55,7 @@ public class Wrapper implements CloudApplication {
     @Getter
     private boolean running = false;
 
-    public void bootstrap(final OptionSet optionSet) {
+    public void bootstrap(final OptionSet optionSet) throws IOException {
         wrapper = this;
 
         this.setRunning(true);
@@ -56,9 +66,11 @@ public class Wrapper implements CloudApplication {
 
         this.documentHandler = new DocumentHandler("de.tammo.cloud.wrapper.config");
 
-        this.setupServer();
+        final ConsoleReader reader = new ConsoleReader();
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        new WrapperSetup().setup(this.logger, reader);
+
+        this.setupServer();
 
         final CommandHandler commandHandler = new CommandHandler("de.tammo.cloud.wrapper.commands", this.logger);
 
@@ -70,27 +82,42 @@ public class Wrapper implements CloudApplication {
             }
         }
 
+        reader.close();
+
         this.shutdown();
     }
 
     private void setupServer() {
         this.registerPackets();
 
-        new NettyClient(new ConnectableAddress(this.configuration.getMasterHost(), this.configuration.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
+        this.nettyClient = new NettyClient(new ConnectableAddress(this.configuration.getMasterHost(), this.configuration.getMasterPort())).withSSL().connect(() -> this.logger.info("Connected to Master!"), () -> {
+            this.logger.warn("Master is currently not available!");
+            this.shutdown();
+        }, channel -> channel.pipeline().addLast(new PacketEncoder()).addLast(new PacketDecoder()).addLast(new PacketHandler()));
     }
 
     public void shutdown() {
         this.logger.info("Open-Cloud Wrapper is stopping!");
 
+        this.setRunning(false);
+
         this.documentHandler.saveFiles();
 
-        this.setRunning(false);
+        this.nettyClient.disconnect(() -> this.logger.info("Wrapper is disconnected!"));
 
         System.exit(0);
     }
 
     private void registerPackets() {
+        PacketRegistry.PacketDirection.IN.addPacket(0, SuccessPacket.class);
+        PacketRegistry.PacketDirection.IN.addPacket(1, ErrorPacket.class);
 
+        PacketRegistry.PacketDirection.IN.addPacket(201, WrapperKeyValidationInPacket.class);
+
+        PacketRegistry.PacketDirection.OUT.addPacket(0, SuccessPacket.class);
+        PacketRegistry.PacketDirection.OUT.addPacket(1, ErrorPacket.class);
+
+        PacketRegistry.PacketDirection.OUT.addPacket(200, WrapperKeyOutPacket.class);
     }
 
 }

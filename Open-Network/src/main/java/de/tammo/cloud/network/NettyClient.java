@@ -4,14 +4,10 @@
 
 package de.tammo.cloud.network;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import de.tammo.cloud.core.threading.ThreadBuilder;
 import de.tammo.cloud.network.utils.ConnectableAddress;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
@@ -23,7 +19,6 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import lombok.RequiredArgsConstructor;
 
 import javax.net.ssl.SSLException;
-import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
@@ -36,9 +31,11 @@ public class NettyClient {
 
     private SslContext sslContext;
 
+    private ChannelFuture future;
+
     private final boolean EPOLL = Epoll.isAvailable();
 
-    public final NettyClient connect(final Runnable ready, final Consumer<Channel> init) {
+    public final NettyClient connect(final Runnable ready, final Runnable fail, final Consumer<Channel> init) {
         new ThreadBuilder("Netty Client", () -> {
             this.workerGroup = this.EPOLL ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
@@ -54,11 +51,22 @@ public class NettyClient {
                                 init.accept(channel);
                             }
 
-                        }).connect(new InetSocketAddress(this.connectableAddress.getHost(), this.connectableAddress.getPort())).syncUninterruptibly();
+                        }).connect(new InetSocketAddress(this.connectableAddress.getHost(), this.connectableAddress.getPort()));
+
+                future.addListener((ChannelFutureListener) channelFuture -> {
+                    if (!channelFuture.isSuccess()) {
+                        fail.run();
+                    }
+                });
+
+                future.syncUninterruptibly();
 
                 ready.run();
 
+                NettyClient.this.future = future;
+
                 future.channel().closeFuture().syncUninterruptibly();
+            } catch (final Exception ignored) {
             } finally {
                 this.workerGroup.shutdownGracefully();
             }
@@ -76,6 +84,11 @@ public class NettyClient {
     }
 
     public void disconnect(final Runnable disconnected) {
+        if (this.future != null) {
+            if (this.future.channel().isOpen()) {
+                this.future.channel().close().syncUninterruptibly();
+            }
+        }
         this.workerGroup.shutdownGracefully();
         disconnected.run();
     }

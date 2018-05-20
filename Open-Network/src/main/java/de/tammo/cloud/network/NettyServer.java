@@ -35,6 +35,8 @@ public class NettyServer {
 
     private SslContext sslContext;
 
+    private ChannelFuture future;
+
     private final boolean EPOLL = Epoll.isAvailable();
 
     public final NettyServer bind(final Runnable ready, final Consumer<Channel> init) {
@@ -60,6 +62,8 @@ public class NettyServer {
 
                 ready.run();
 
+                NettyServer.this.future = future;
+
                 future.channel().closeFuture().syncUninterruptibly();
             } finally {
                 this.workerGroup.shutdownGracefully();
@@ -81,6 +85,9 @@ public class NettyServer {
     }
 
     public void close(final Runnable closed) {
+        if (this.future.channel().isOpen()) {
+            this.future.channel().close().syncUninterruptibly();
+        }
         this.workerGroup.shutdownGracefully();
         this.bossGroup.shutdownGracefully();
         closed.run();

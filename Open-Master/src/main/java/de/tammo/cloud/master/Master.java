@@ -11,8 +11,11 @@ import de.tammo.cloud.core.logging.LogLevel;
 import de.tammo.cloud.core.logging.Logger;
 import de.tammo.cloud.master.network.NetworkHandler;
 import de.tammo.cloud.master.network.handler.PacketHandler;
+import de.tammo.cloud.master.network.packets.WrapperKeyInPacket;
+import de.tammo.cloud.master.network.packets.WrapperKeyValidationOutPacket;
 import de.tammo.cloud.master.network.wrapper.Wrapper;
 import de.tammo.cloud.master.setup.LoginSetup;
+import de.tammo.cloud.master.setup.MasterSetup;
 import de.tammo.cloud.network.NettyServer;
 import de.tammo.cloud.network.handler.PacketDecoder;
 import de.tammo.cloud.network.handler.PacketEncoder;
@@ -43,26 +46,11 @@ public class Master implements CloudApplication {
 
     private DocumentHandler documentHandler;
 
+    private NettyServer nettyServer;
+
     @Setter
     @Getter
     private boolean running = false;
-
-    /*
-
-    instance -> running
-    logger init
-    print header
-
-    instances
-
-    reader
-
-    login (login setup) -> Setup -> Setup Server -> Command Handler -> Shutdown
-
-    Logger -> remove prompt format
-    Console Reader readLine with prompt
-
-     */
 
     public void bootstrap(final OptionSet optionSet) throws IOException{
         master = this;
@@ -79,10 +67,12 @@ public class Master implements CloudApplication {
 
         this.documentHandler = new DocumentHandler("de.tammo.cloud.master.config");
 
-        final ConsoleReader reader = new ConsoleReader(null, System.in, System.out, null);
+        final ConsoleReader reader = new ConsoleReader(System.in, System.out);
         reader.setHistoryEnabled(false);
 
         new LoginSetup().setup(this.logger, reader);
+
+        new MasterSetup().setup(this.logger, reader);
 
         this.setupServer(() -> this.logger.info("Server was successfully bound to port 1337"));
 
@@ -104,7 +94,7 @@ public class Master implements CloudApplication {
     private void setupServer(final Runnable ready) {
         this.registerPackets();
 
-        new NettyServer(1337).withSSL().bind(ready, channel -> {
+        this.nettyServer = new NettyServer(1337).withSSL().bind(ready, channel -> {
             final String host = this.networkHandler.getHostFromChannel(channel);
             if (!this.networkHandler.isWhitelisted(host)) {
                 channel.close().syncUninterruptibly();
@@ -126,6 +116,10 @@ public class Master implements CloudApplication {
 
         this.documentHandler.saveFiles();
 
+        this.networkHandler.getWrappers().stream().filter(Wrapper::isConnected).forEach(wrapper -> wrapper.getChannel().close().syncUninterruptibly());
+
+        this.nettyServer.close(() -> logger.info("Netty server was closed!"));
+
         System.exit(0);
     }
 
@@ -133,8 +127,12 @@ public class Master implements CloudApplication {
         PacketRegistry.PacketDirection.IN.addPacket(0, SuccessPacket.class);
         PacketRegistry.PacketDirection.IN.addPacket(1, ErrorPacket.class);
 
+        PacketRegistry.PacketDirection.IN.addPacket(200, WrapperKeyInPacket.class);
+
         PacketRegistry.PacketDirection.OUT.addPacket(0, SuccessPacket.class);
         PacketRegistry.PacketDirection.OUT.addPacket(1, ErrorPacket.class);
+
+        PacketRegistry.PacketDirection.OUT.addPacket(201, WrapperKeyValidationOutPacket.class);
     }
 
 }

@@ -19,7 +19,12 @@ public class Wrapper {
     private final WrapperMeta wrapperMeta;
 
     @Setter
+    @Getter
     private Channel channel;
+
+    @Setter
+    @Getter
+    private boolean verified = false;
 
     @Getter
     private final ConcurrentLinkedQueue<Packet> queue = new ConcurrentLinkedQueue<>();

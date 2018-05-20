@@ -37,9 +37,11 @@ public class WrapperCommand implements Command {
                     return true;
                 }
 
-                final Wrapper wrapper = new Wrapper(new WrapperMeta(UUID.randomUUID(), args[1]));
+                final String key = Master.getMaster().getNetworkHandler().generateWrapperKey();
+                final Wrapper wrapper = new Wrapper(new WrapperMeta(UUID.randomUUID(), args[1], key));
                 Master.getMaster().getNetworkHandler().addWrapper(wrapper);
                 Master.getMaster().getLogger().info("Added wrapper on host " + wrapper.getWrapperMeta().getHost() + " with unique id " + wrapper.getWrapperMeta().getUuid().toString());
+                Master.getMaster().getLogger().info("Key for wrapper is: " + key);
                 return true;
             } else if (args[0].equalsIgnoreCase("delete")) {
                 final Wrapper wrapper = Master.getMaster().getNetworkHandler().getWrapperByHost(args[1]);

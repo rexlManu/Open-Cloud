@@ -11,6 +11,7 @@ import lombok.Getter;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class NetworkHandler {
 
@@ -45,6 +46,10 @@ public class NetworkHandler {
 
     public boolean isWhitelisted(final String ip) {
         return this.wrappers.stream().filter(wrapper -> wrapper.getWrapperMeta().getHost().equalsIgnoreCase(ip)).findFirst().orElse(null) != null;
+    }
+
+    public final String generateWrapperKey() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
 }
