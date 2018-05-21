@@ -9,10 +9,37 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.targetEncoding>UTF-8</project.build.targetEncoding>
+
+        <!-- Open-Cloud Version -->
+
+        <version.open-cloud>1.0-SNAPSHOT</version.open-cloud>
+
+        <!-- Dependency Versions -->
+        <version.lombok>1.16.20</version.lombok>
+        <version.jopt>5.0.4</version.jopt>
+        <version.gson>2.8.4</version.gson>
+        <version.guava>25.0-jre</version.guava>
+        <version.netty>4.1.25.Final</version.netty>
+        <version.jline>2.14.6</version.jline>
+    </properties>
+
     <groupId>de.tammo.cloud</groupId>
     <artifactId>Open-Cloud</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+
+    <name>Open-Cloud</name>
+
+    <developers>
+        <developer>
+            <name>Tammo</name>
+        </developer>
+    </developers>
 
     <modules>
         <module>Open-Core</module>
@@ -22,10 +49,5 @@
         <module>Open-Modules</module>
         <module>Open-API</module>
     </modules>
-
-    <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
 
 </project>

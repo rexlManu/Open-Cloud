@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>LATEST</version>
+            <version>${version.lombok}</version>
         </dependency>
 
     </dependencies>
